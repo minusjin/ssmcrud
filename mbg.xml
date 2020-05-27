@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+<generatorConfiguration>
+    <context id="DB2Tables" targetRuntime="MyBatis3">
+        <commentGenerator>
+            <property name="suppressAllComments" value="true" />
+        </commentGenerator>
+        <!--配置jdbc连接数据-->
+        <jdbcConnection driverClass="com.mysql.jdbc.Driver"
+                        connectionURL="jdbc:mysql://localhost:3306/ssm_atguigu_crud"
+                        userId="root"
+                        password="123456">
+        </jdbcConnection>
+
+        <javaTypeResolver >
+            <property name="forceBigDecimals" value="false" />
+        </javaTypeResolver>
+        <!--生成的pojo包放置的位置,生成bean
+        生成工程的目录-->
+        <javaModelGenerator targetPackage="com.crud.pojo" targetProject=".\src\main\java">
+            <property name="enableSubPackages" value="true" />
+            <property name="trimStrings" value="true" />
+        </javaModelGenerator>
+        <!--sql映射文件生成器，指定xml生成的位置-->
+        <sqlMapGenerator targetPackage="mapper"  targetProject=".\src\main\resources">
+            <property name="enableSubPackages" value="true" />
+        </sqlMapGenerator>
+        <!--dao接口生成位置-->
+        <javaClientGenerator type="XMLMAPPER" targetPackage="com.crud.mapper"  targetProject=".\src\main\java">
+            <property name="enableSubPackages" value="true" />
+        </javaClientGenerator>
+<!--逆向生成指定表-->
+        <table  tableName="t_department" domainObjectName="Department" ></table>
+        <table tableName="t_employee" domainObjectName="Employee"></table>
+        <table tableName="t_user" domainObjectName="User"></table>
+    </context>
+</generatorConfiguration>

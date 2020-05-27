@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context-3.0.xsd
+	http://www.springframework.org/schema/mvc
+	http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">
+<!--springmvc的配置 包含网站跳转逻辑的控制，配置-->
+    <!--开启注解扫描-->
+    <context:component-scan base-package="com.crud" />
+
+    <!-- 配置freeMarker视图解析器 -->
+    <bean id="freemarkerViewResolver"
+          class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">
+        <property name="viewClass" value="org.springframework.web.servlet.view.freemarker.FreeMarkerView"/>
+        <property name="viewNames" value="/WEB-INF/pages" />
+        <property name="contentType" value="text/html; charset=utf-8" />
+        <property name="suffix" value=".html" />
+        <property name="order" value="0" />
+    </bean>
+    <!--配置访问静态资源-->
+    <!--如果发现是静态资源的请求，就将该请求转由Web应用服务器默认的Servlet处理，
+       如果不是静态资源的请求，才由DispatcherServlet继续处理-->
+    <mvc:default-servlet-handler/>
+    <!--启用spring的注解功能-->
+    <mvc:annotation-driven/>
+    <!--json转换器-->
+    <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
+        <property name="messageConverters">
+            <list >
+                <ref bean="mappingJacksonHttpMessageConverter" />
+            </list>
+        </property>
+    </bean>
+    <bean id="mappingJacksonHttpMessageConverter"
+          class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+        <property name="supportedMediaTypes">
+            <list>
+                <value>text/html;charset=UTF-8</value>
+            </list>
+        </property>
+    </bean>
+
+
+</beans>
+
