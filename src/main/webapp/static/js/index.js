@@ -5,6 +5,8 @@ $(function () {
     $(function () {
         // 跳到首页
         to_page(1);
+
+
     });
 
     function to_page(pn) {
@@ -24,6 +26,8 @@ $(function () {
         })
     }
 
+
+// 解析并显示员工数据
     function build_emps_table(result) {
         // 清空表格
         $("#emps_table tbody").empty();
@@ -35,12 +39,14 @@ $(function () {
             var empNameTd = $("<td></td>").append(item.empName);
             var genderTd = $("<td></td>").append(item.gender == 'M' ? "男" : "女");
             var emailTd = $("<td></td>").append(item.email);
+            var deptId = $("<td></td>").append(item.department.deptId);
             var deptNameTd = $("<td></td>").append(item.department.deptName);
             var editBtn = $("<button></button>").addClass("btn btn-primary btn-sm edit_btn")
                 .append($("<span></span>").addClass("glyphicon glyphicon-pencil"))
                 .append("编辑");
             // 为编辑按钮添加一个自定义的属性，来表示当前员工的id
             editBtn.attr("edit-id", item.empId);
+
             var delBtn = $("<button></button>").addClass("btn btn-danger btn-sm delete_btn")
                 .append($("<span></span>").addClass("glyphicon glyphicon-trash"))
                 .append("删除");
@@ -58,17 +64,22 @@ $(function () {
                 .appendTo("#emps_table tbody");
         })
     }
+
 // 解析显示分页信息
     function build_page_info(result) {
+        //清空分页导航
         $("#page_info_area").empty();
+
         $("#page_info_area").append("当前 " + result.extend.pageInfo.pageNum + " 页，" +
             "总 " + result.extend.pageInfo.pages + " 页，总 " + result.extend.pageInfo.total + " 条记录");
+
         totalRecord = result.extend.pageInfo.total;
         currentPage = result.extend.pageInfo.pageNum;
     }
 
 // 解析显示分页导航条
     function build_page_nav(result) {
+
         $("#page_nav_area").empty();
         var ul = $("<ul></ul>").addClass("pagination")
         // 首页li
@@ -150,6 +161,19 @@ $(function () {
         })
     });
 
+  //点击部门管理按钮，弹出模态框
+    $("#emp_dept_modal_btn").click(function () {
+// 点击部门弹出模态框之前，清空表单数据以及表单的样式
+        reset_form("#deptModal form");
+        // 发送Ajax请求，查出部门信息显示在下拉列表中
+        getDept("#depts_table tbody");
+        // 打开用于新增的模态框，并设置属性，点击其他地方时此模态框不会关闭
+        $("#deptModal").modal({
+            backdrop:"static"
+        })
+
+    })
+
 // 查出所有的部门信息并显示在下拉列表中
     function getDepts(ele) {
         // 清空之前下拉列表的值
@@ -167,6 +191,33 @@ $(function () {
             }
         });
     }
+
+
+//查出所有部门显示列表中
+    function getDept(ele) {
+        // 清空之前下拉列表的值
+        $(ele).empty();
+        $.ajax({
+            url: "http://localhost:8080/depts",
+            type: "GET",
+            success: function (result) {
+                // 在下拉列表中显示部门信息
+                // 遍历部门信息
+                $.each(result.extend.depts, function () {
+                    var deptId = $("<td></td>").append(this.deptId);
+                    var deptNameTd = $("<td></td>").append(this.deptName);
+                    var delBtn = $("<button></button>").addClass("btn btn-danger btn-sm deletedept_btn")
+                        .append($("<span></span>").addClass("glyphicon glyphicon-trash"))
+                        .append("删除");
+                    // 为删除按钮添加一个自定义的属性，来表示当前需要删除员工的id
+                    delBtn.attr("dept-id", this.deptId)
+                    var btnTd = $("<td></td>").append(delBtn);
+                    $("<tr></tr>").append(deptId).append(deptNameTd).append(btnTd).appendTo(ele);
+                });
+            }
+        });
+    }
+
 
 // 校验表单数据的方法
     function validate_add_form() {
@@ -254,7 +305,7 @@ $(function () {
 
         // 3.发送Ajax请求保存员工
         $.ajax({
-            url: "http://localhost:8080/emp",
+            url: "http://localhost:8080/emps",
             type: "POST",
             // $("#empAddModal form").serialize() 提取要提交的数据
             data: $("#empAddModal form").serialize(),
@@ -283,6 +334,25 @@ $(function () {
         });
     });
 
+ //保存部门信息
+    $("#dept_save_btn").click(function () {
+        // 3.发送Ajax请求保存员工
+        $.ajax({
+            url: "http://localhost:8080/savedept",
+            type: "POST",
+            data: $("#dept").serialize(),
+            // $("#empAddModal form").serialize() 提取要提交的数据
+
+            success: function (result) {
+                if (result.code == 200) {
+                    // 当员工的数据保存成功以后，需要以下的步骤
+                    getDept("#depts_table tbody");
+                }
+            }
+        });
+    });
+
+
 // 1.由于在创建按钮之前绑定了click事件，所以绑定不上
 // 可以在创建按钮的时候绑定事件
     $(document).on("click", ".edit_btn", function () {
@@ -293,6 +363,7 @@ $(function () {
         getEmp($(this).attr("edit-id"));
         // 把员工的id传给模态框的更新按钮
         $("#emp_update_btn").attr("edit-id", $(this).attr("edit-id"));
+
         $("#empUpdateModal").modal({
             backdrop: "static"
         })
@@ -359,6 +430,30 @@ $(function () {
             })
         }
     });
+
+//删除部门
+    $(document).on("click", ".deletedept_btn", function () {
+        // 弹出是否删除的对话框
+        var deptName = $(this).parents("tr").find("td:eq(1)").text();
+        // 获取需要删除部门的id
+        var deptId = $(this).attr("dept-id");
+        if (confirm("您确认要删除【" + deptName + "】吗？")) {
+            // 点击确认，发送ajax请求
+            $.ajax({
+                url: "http://localhost:8080/depts/" + deptId,
+                type: "DELETE",
+                success: function (result) {
+                    alert(result.msg);
+                    // 回到当前页
+                    getDept("#depts_table tbody");
+                }
+            })
+        }
+    });
+
+
+
+
 
 // 完成多选框的全选和全不选
 // 注意： attr获取checked是underfined, 应该使用dom原生的属性prop.   attr获取自定义的属性值

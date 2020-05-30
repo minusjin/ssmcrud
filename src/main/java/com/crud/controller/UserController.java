@@ -12,7 +12,11 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.Map;
-
+/** 
+ * @Description: 登录控制层 
+ * @Author: jpj
+ * @Date: 2020/5/30 
+ */
 @RestController
 @RequestMapping("/user")
 public class UserController {

@@ -8,7 +8,7 @@
          version="2.5">
     <!--welcome pages-->
     <welcome-file-list>
-        <welcome-file>login.html</welcome-file>
+        <welcome-file>/pages/login.html</welcome-file>
     </welcome-file-list>
 <!--配置监听器-->
     <listener>
