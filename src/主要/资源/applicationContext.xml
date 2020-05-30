@@ -19,7 +19,7 @@
     <!--配置数据库连接池（阿里巴巴连接池）-->
     <bean id="pooledDataSource" class="com.alibaba.druid.pool.DruidDataSource">
         <property name="driverClassName" value="com.mysql.jdbc.Driver"></property>
-        <property name="url" value="jdbc:mysql://localhost:3306/ssm_atguigu_crud?characterEncoding=utf-8"></property>
+        <property name="url" value="jdbc:mysql://localhost:3306/ssmcrud?characterEncoding=utf-8"></property>
         <property name="username" value="root"></property>
         <property name="password" value="123456"></property>
     </bean>
